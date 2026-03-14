@@ -1,0 +1,174 @@
+:root {
+  --bg-page: #0a0a0a;
+  --bg-sidebar: #111111;
+  --bg-card: #141414;
+  --bg-elevated: #1a1a1a;
+  
+  --border-subtle: #222222;
+  --border-default: #2a2a2a;
+  --border-hover: #333333;
+  --border-focus: #444444;
+  
+  --text-primary: #ffffff;
+  --text-secondary: #a0a0a0;
+  --text-tertiary: #555555;
+  
+  --accent-hover: #3a3a3a;
+  
+  --status-success-bg: #2d4a2d;
+  --status-success-text: #5a8a5a;
+  --status-failed-bg: #4a2d2d;
+  --status-failed-text: #8a5a5a;
+  --status-running-bg: #2d3a4a;
+  --status-running-text: #5a7a8a;
+  --status-pending-bg: #3a3a2d;
+  --status-pending-text: #8a8a5a;
+
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--bg-page);
+  color: var(--text-primary);
+  overflow-y: scroll;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+::-webkit-scrollbar-thumb {
+  background: #2a2a2a;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3a3a3a;
+}
+
+/* Focus states */
+*:focus-visible {
+  outline: 1px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+/* Element Plus Overrides */
+.el-button {
+  font-family: var(--font-sans);
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.el-button--primary {
+  background-color: var(--text-primary) !important;
+  border-color: var(--text-primary) !important;
+  color: #000000 !important;
+}
+.el-button--primary:hover {
+  background-color: #e0e0e0 !important;
+  border-color: #e0e0e0 !important;
+}
+
+.el-button.is-link {
+  color: var(--text-tertiary) !important;
+}
+.el-button.is-link:hover {
+  color: var(--text-primary) !important;
+}
+
+.el-dialog {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-subtle) !important;
+  border-radius: 12px !important;
+  box-shadow: none !important;
+}
+.el-dialog__header {
+  border-bottom: 1px solid var(--border-subtle);
+  margin-right: 0 !important;
+  padding-bottom: 16px !important;
+}
+.el-dialog__title {
+  color: var(--text-primary) !important;
+  font-family: var(--font-mono);
+  font-size: 14px !important;
+  font-weight: 500 !important;
+}
+.el-dialog__body {
+  color: var(--text-secondary) !important;
+}
+.el-dialog__footer {
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 16px !important;
+}
+.el-overlay {
+  background-color: rgba(0, 0, 0, 0.8) !important;
+}
+
+.el-form-item__label {
+  color: var(--text-tertiary) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 11px !important;
+}
+
+.el-input__wrapper, .el-input-number__increase, .el-input-number__decrease {
+  background-color: var(--bg-sidebar) !important;
+  border: 1px solid var(--border-subtle) !important;
+  box-shadow: none !important;
+}
+.el-input__wrapper.is-focus {
+  border-color: var(--border-focus) !important;
+}
+.el-input__inner {
+  color: var(--text-primary) !important;
+  font-family: var(--font-mono);
+}
+
+.el-table {
+  background-color: transparent !important;
+  --el-table-border-color: var(--border-subtle) !important;
+  --el-table-header-bg-color: var(--bg-sidebar) !important;
+  --el-table-header-text-color: var(--text-tertiary) !important;
+  --el-table-text-color: var(--text-secondary) !important;
+  --el-table-row-hover-bg-color: var(--bg-card) !important;
+  --el-table-bg-color: transparent !important;
+  --el-table-tr-bg-color: transparent !important;
+}
+.el-table th.el-table__cell {
+  background-color: var(--bg-sidebar) !important;
+  border-bottom: 1px solid var(--border-subtle) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 10px;
+  font-weight: 600;
+}
+.el-table td.el-table__cell {
+  border-bottom: 1px solid var(--border-subtle) !important;
+}
+.el-table::before, .el-table::after {
+  display: none !important;
+}
+.el-table__inner-wrapper::before {
+  display: none !important;
+}
+
+.el-tag {
+  border: none !important;
+  font-family: var(--font-mono);
+  font-size: 11px !important;
+}

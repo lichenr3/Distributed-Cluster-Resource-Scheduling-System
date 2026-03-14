@@ -1,0 +1,2 @@
+MASTER_URL = "http://localhost:8000"
+HEARTBEAT_INTERVAL = 5

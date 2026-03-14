@@ -1,0 +1,38 @@
+# ── OS artifacts ──
+.DS_Store
+Thumbs.db
+Desktop.ini
+nul
+
+# ── Editor / IDE ──
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# ── Python ──
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+*.egg-info/
+
+# ── Node.js ──
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# ── Logs ──
+*.log
+
+# ── Design reference (binary, not source) ──
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+
+# ── Original requirement PDF (large binary) ──
+*.pdf
