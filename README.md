@@ -43,7 +43,7 @@
 
 ## 环境要求
 
-- **Python** ≥ 3.13
+- **Python** ≥ 3.11
 - **Node.js** ≥ 20.19.0
 - **uv** (Python 包管理器) — [安装指南](https://docs.astral.sh/uv/getting-started/installation/)
 
