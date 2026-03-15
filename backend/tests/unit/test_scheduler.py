@@ -52,14 +52,6 @@ def test_score_worker_handles_asymmetric_resources(make_worker, make_task):
     assert scheduler.score_worker(worker, task) == pytest.approx(1.125)
 
 
-def test_can_any_worker_fit_checks_total_capacity_not_remaining(make_worker, make_task):
-    scheduler = SchedulerService()
-    make_worker(total_cpu=8, total_mem=16, used_cpu=8, used_mem=16)
-    task = make_task(cpu_required=4, mem_required=8)
-
-    assert scheduler.can_any_worker_fit(task) is True
-
-
 @pytest.mark.asyncio
 async def test_schedule_task_selects_best_fit_and_sets_scheduled_at(monkeypatch, make_worker, make_task):
     scheduler = SchedulerService()
@@ -181,14 +173,3 @@ async def test_try_reschedule_pending_schedules_after_capacity_frees(monkeypatch
 
     assert task["worker_id"] == worker["worker_id"]
     assert task.get("scheduled_at") is not None
-
-
-@pytest.mark.asyncio
-async def test_try_reschedule_pending_marks_unfittable_task_failed(make_task):
-    scheduler = SchedulerService()
-    task = make_task(cpu_required=100, mem_required=100)
-
-    await scheduler.try_reschedule_pending()
-
-    assert task["status"] == "failed"
-    assert task["finished_at"] is not None

@@ -24,12 +24,12 @@ def service(scheduler: SchedulerService) -> TaskService:
 
 
 @pytest.mark.asyncio
-async def test_create_and_schedule_creates_pending_task_and_log_buffer(monkeypatch, service):
+async def test_create_and_schedule_creates_pending_task_and_log_buffer(monkeypatch, service, make_worker):
     async def fake_schedule(task_dict):
         return False
 
     monkeypatch.setattr(service.scheduler, "schedule_task", fake_schedule)
-    monkeypatch.setattr(service.scheduler, "can_any_worker_fit", lambda task_dict: True)
+    make_worker(total_cpu=4, total_mem=8)
 
     result = await service.create_and_schedule(
         TaskSubmitRequest(command="echo hello", cpu_required=1, mem_required=2)
@@ -47,12 +47,12 @@ async def test_create_and_schedule_creates_pending_task_and_log_buffer(monkeypat
 
 
 @pytest.mark.asyncio
-async def test_create_and_schedule_marks_failed_when_no_worker_can_fit(monkeypatch, service):
+async def test_create_and_schedule_marks_failed_when_no_worker_can_fit(monkeypatch, service, make_worker):
     async def fake_schedule(task_dict):
         return False
 
     monkeypatch.setattr(service.scheduler, "schedule_task", fake_schedule)
-    monkeypatch.setattr(service.scheduler, "can_any_worker_fit", lambda task_dict: False)
+    make_worker(total_cpu=4, total_mem=8)
 
     result = await service.create_and_schedule(
         TaskSubmitRequest(command="python app.py", cpu_required=99, mem_required=99)

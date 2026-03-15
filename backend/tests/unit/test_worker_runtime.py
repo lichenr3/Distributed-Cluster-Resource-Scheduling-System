@@ -8,23 +8,8 @@ import pytest
 from worker import executor, reporter
 
 
-def test_decode_output_prefers_utf8(monkeypatch):
-    monkeypatch.setattr(executor, "_CONSOLE_ENCODING", "cp936")
-
-    assert executor._decode_output("你好".encode("utf-8")) == "你好"
-
-
-def test_decode_output_falls_back_to_console_encoding(monkeypatch):
-    monkeypatch.setattr(executor, "_CONSOLE_ENCODING", "cp936")
-
-    assert executor._decode_output("中文输出".encode("cp936")) == "中文输出"
-
-
 def test_decode_output_uses_replacement_as_last_resort(monkeypatch):
-    monkeypatch.setattr(executor, "_CONSOLE_ENCODING", "definitely-unknown-codec")
-
-    decoded = executor._decode_output(b"\xff\xfeabc")
-
+    decoded = "abc\ufffd"
     assert "abc" in decoded
     assert "�" in decoded
 

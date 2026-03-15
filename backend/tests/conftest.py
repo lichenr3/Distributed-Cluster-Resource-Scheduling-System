@@ -21,10 +21,12 @@ def reset_store() -> Generator[None, None, None]:
     store.workers.clear()
     store.tasks.clear()
     store.task_logs.clear()
+    store._worker_name_counter = 0
     yield
     store.workers.clear()
     store.tasks.clear()
     store.task_logs.clear()
+    store._worker_name_counter = 0
 
 
 def _utc_now() -> str:
