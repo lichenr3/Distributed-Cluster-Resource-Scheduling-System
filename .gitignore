@@ -36,12 +36,13 @@ dist-ssr/
 *.bmp
 
 # ── Original requirement PDF (large binary) ──
-*.pdf
+睿思芯科AI挑战题*.pdf
 
 # ── Temp test output ──
 stderr.txt
 stdout.txt
 test_output.txt
+out.txt
 
 # ── Tool state (OpenCode / Sisyphus) ──
 .sisyphus/
