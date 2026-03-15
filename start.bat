@@ -47,7 +47,7 @@ start "Master :8000" cmd /k "cd /d "%BACKEND%" && uv run python run_master.py"
 
 :: Wait for Master to be ready before starting workers
 echo [WAIT] Waiting for Master to be ready...
-timeout /t 2 /nobreak >nul
+timeout /t 5 /nobreak >nul
 
 :: ---------- Start Workers ----------
 echo [START] Worker-1 on :8001 (cpu=4, mem=8)
