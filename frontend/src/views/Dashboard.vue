@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useClusterWs } from '@/composables/useClusterWs'
 import ClusterHeatmap from '@/components/ClusterHeatmap.vue'
 import TaskList from '@/components/TaskList.vue'
@@ -23,6 +23,16 @@ const submitFormRef = ref<InstanceType<typeof TaskSubmitForm> | null>(null)
 function handleTaskSubmitted() {
   taskListRef.value?.fetchTasks()
 }
+
+// Auto-refresh task list when cluster summary changes (task completed/failed)
+let refreshTimer: ReturnType<typeof setTimeout> | null = null
+watch(
+  () => `${tasksSummary.value.pending}-${tasksSummary.value.running}-${tasksSummary.value.success}-${tasksSummary.value.failed}`,
+  () => {
+    if (refreshTimer) clearTimeout(refreshTimer)
+    refreshTimer = setTimeout(() => taskListRef.value?.fetchTasks(), 300)
+  },
+)
 
 // ── Log modal ──
 const logVisible = ref(false)
@@ -58,7 +68,7 @@ function scrollToSection(id: string) {
           @click="scrollToSection('overview')"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-          Overview
+          概览
         </div>
         
         <div class="nav-group">CLUSTER</div>
@@ -68,7 +78,7 @@ function scrollToSection(id: string) {
           @click="scrollToSection('cluster')"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line></svg>
-          Workers & Heatmap
+          节点与热力图
         </div>
         
         <div class="nav-group">TASKS</div>
@@ -78,18 +88,9 @@ function scrollToSection(id: string) {
           @click="scrollToSection('tasks')"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
-          All Tasks
-        </div>
-        <div class="nav-item" @click="submitFormRef?.open()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-          Submit New
+          全部任务
         </div>
       </nav>
-
-      <div class="ws-status">
-        <div class="status-dot" :class="wsStatus"></div>
-        <span>{{ wsStatus === 'connected' ? 'Connected' : 'Disconnected' }}</span>
-      </div>
     </aside>
 
     <!-- Main Content -->
@@ -99,8 +100,8 @@ function scrollToSection(id: string) {
         <!-- Section 1: Top Header Bar -->
         <header class="dashboard-header">
           <div class="header-left">
-            <h1 class="page-title">Cluster Overview</h1>
-            <p class="page-subtitle">Real-time cluster monitoring</p>
+            <h1 class="page-title">集群概览</h1>
+            <p class="page-subtitle">Real-time Cluster Monitoring</p>
           </div>
           <div class="header-right">
             <div class="task-counters">
@@ -111,9 +112,9 @@ function scrollToSection(id: string) {
             </div>
             <div class="ws-status-inline">
               <div class="status-dot" :class="wsStatus"></div>
-              <span>{{ wsStatus === 'connected' ? 'Connected' : 'Disconnected' }}</span>
+              <span>{{ wsStatus === 'connected' ? '已连接' : '未连接' }}</span>
             </div>
-            <button class="btn-solid" @click="submitFormRef?.open()">SUBMIT TASK</button>
+            <button class="btn-solid" @click="submitFormRef?.open()">提交任务</button>
           </div>
         </header>
 
@@ -121,7 +122,7 @@ function scrollToSection(id: string) {
         <section class="section" id="cluster">
           <div class="card-container">
             <div class="card-header">
-              <h2 class="section-title">CLUSTER NODES</h2>
+              <h2 class="section-title">集群节点</h2>
               <div class="online-badge">
                 <span class="status-dot connected"></span> ONLINE {{ onlineWorkersCount }} / {{ workers.length }}
               </div>
@@ -136,7 +137,7 @@ function scrollToSection(id: string) {
         <section class="section" id="tasks">
           <div class="card-container">
             <div class="card-header">
-              <h2 class="section-title">RECENT TASKS</h2>
+              <h2 class="section-title">近期任务</h2>
               <div class="task-filters">
                 <div class="filter-tabs">
                   <button 
@@ -461,9 +462,9 @@ function scrollToSection(id: string) {
 }
 
 .section-title {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-tertiary);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
   letter-spacing: 0.05em;
   margin: 0;
   white-space: nowrap;

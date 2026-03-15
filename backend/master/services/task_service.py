@@ -13,8 +13,18 @@ class TaskService:
 
     async def create_and_schedule(self, req: TaskSubmitRequest) -> TaskInfo:
         now = datetime.now(timezone.utc).isoformat()
-        task_id = str(uuid4())
+        task_id = req.task_id if req.task_id else str(uuid4())
 
+        if task_id in store.tasks:
+            raise ValueError(f"Task ID {task_id} already exists")
+
+        # Check if any worker can potentially run this task
+        can_run = False
+        for worker in store.workers.values():
+            if worker["total_cpu"] >= req.cpu_required and worker["total_mem"] >= req.mem_required:
+                can_run = True
+                break
+                
         task: store.TaskState = {
             "task_id": task_id,
             "command": req.command,
@@ -27,7 +37,21 @@ class TaskService:
             "finished_at": None,
         }
         store.tasks[task_id] = task
-        _ = store.get_or_create_log_buffer(task_id)
+        log_buffer = store.get_or_create_log_buffer(task_id)
+
+        if not can_run:
+            task["status"] = "failed"
+            task["finished_at"] = now
+            error_msg = f"No worker has enough capacity to run this task (Required: CPU {req.cpu_required}, MEM {req.mem_required}GB). Task failed."
+            log_buffer.append({
+                "line_no": 1,
+                "content": error_msg,
+                "timestamp": now,
+            })
+            # Broadcast the failure logs immediately (in background but asyncio is running)
+            await broadcast_log(task_id, log_buffer[-1])
+            await broadcast_task_completed(task_id, "failed", None)
+            return self._to_task_info(task)
 
         _ = await self.scheduler.schedule_task(task)
         return self._to_task_info(task)

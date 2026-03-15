@@ -22,7 +22,7 @@ function formatTime(isoString: string) {
 
 <template>
   <div :class="['worker-card', { 'worker-offline': worker.status === 'offline' }]">
-    <div v-if="worker.status === 'offline'" class="offline-badge">OFFLINE</div>
+    <div v-if="worker.status === 'offline'" class="offline-badge">离线</div>
     
     <div class="card-header">
       <span class="worker-name">{{ worker.display_name }}</span>
@@ -51,11 +51,11 @@ function formatTime(isoString: string) {
 
     <div class="meta">
       <div class="meta-item">
-        <span class="meta-label">TASKS</span>
+        <span class="meta-label">运行任务</span>
         <span class="meta-value">{{ worker.task_count }}</span>
       </div>
       <div class="meta-item">
-        <span class="meta-label">HEARTBEAT</span>
+        <span class="meta-label">心跳时间</span>
         <span class="meta-value">{{ formatTime(worker.last_heartbeat) }}</span>
       </div>
     </div>
@@ -94,8 +94,8 @@ function formatTime(isoString: string) {
   padding: 4px 12px;
   border: 1px solid var(--border-subtle);
   border-radius: 4px;
-  font-family: var(--font-mono);
-  font-size: 12px;
+  font-family: var(--font-sans);
+  font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.1em;
   z-index: 10;
@@ -162,7 +162,7 @@ function formatTime(isoString: string) {
 
 .bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, #2a2a2a, #4a4a4a);
+  background: linear-gradient(90deg, #555555, #cccccc);
   border-radius: 3px;
   transition: width 0.3s ease;
 }

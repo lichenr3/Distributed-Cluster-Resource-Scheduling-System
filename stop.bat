@@ -14,18 +14,11 @@ taskkill /f /fi "WINDOWTITLE eq Worker*"  >nul 2>&1
 echo [STOP] Killing frontend process (vite)...
 taskkill /f /fi "WINDOWTITLE eq Frontend*" >nul 2>&1
 
-:: Fallback: kill by process name if windows are renamed
-for /f "tokens=5" %%p in ('netstat -aon ^| findstr ":8000 " ^| findstr "LISTENING"') do (
-    taskkill /f /pid %%p >nul 2>&1
-)
-for /f "tokens=5" %%p in ('netstat -aon ^| findstr ":8001 " ^| findstr "LISTENING"') do (
-    taskkill /f /pid %%p >nul 2>&1
-)
-for /f "tokens=5" %%p in ('netstat -aon ^| findstr ":8002 " ^| findstr "LISTENING"') do (
-    taskkill /f /pid %%p >nul 2>&1
-)
-for /f "tokens=5" %%p in ('netstat -aon ^| findstr ":5173 " ^| findstr "LISTENING"') do (
-    taskkill /f /pid %%p >nul 2>&1
+:: Fallback: kill by port if window titles were renamed
+for %%P in (8000 8001 8002 5173) do (
+    for /f "tokens=5" %%p in ('netstat -aon ^| findstr ":%%P " ^| findstr "LISTENING"') do (
+        taskkill /f /pid %%p >nul 2>&1
+    )
 )
 
 echo.

@@ -22,24 +22,24 @@ function getMemPercent(w: WorkerInfo) {
 }
 
 function getHeatmapColor(percent: number) {
-  if (percent >= 100) return '#555555'
-  if (percent >= 75) return '#444444'
-  if (percent >= 50) return '#3a3a3a'
-  if (percent >= 25) return '#2a2a2a'
-  return '#1a1a1a'
+  if (percent >= 100) return '#ffffff'
+  if (percent >= 75) return '#cccccc'
+  if (percent >= 50) return '#888888'
+  if (percent >= 25) return '#555555'
+  return '#2a2a2a'
 }
 </script>
 
 <template>
   <div class="cluster-heatmap">
     <div v-if="workers.length === 0" class="empty-state">
-      NO WORKERS REGISTERED
+      暂无已注册的 Worker 节点
     </div>
     <template v-else>
       <!-- Expandable Heatmap Card -->
       <div class="heatmap-card" :class="{ expanded: isExpanded }">
         <div class="heatmap-header" @click="toggleExpand">
-          <span class="heatmap-title">RESOURCE HEATMAP</span>
+          <span class="heatmap-title">资源热力图</span>
           <svg class="expand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="6 9 12 15 18 9"></polyline>
           </svg>
@@ -74,8 +74,8 @@ function getHeatmapColor(percent: number) {
             <div class="grid-row labels-row">
               <div class="row-label"></div>
               <div class="cells">
-                <div v-for="w in workers" :key="`label-${w.worker_id}`" class="col-label">
-                  {{ w.display_name.substring(0, 4) }}
+                <div v-for="w in workers" :key="`label-${w.worker_id}`" class="col-label" :title="w.display_name">
+                  {{ w.display_name.replace('worker-', 'w') }}
                 </div>
               </div>
             </div>
@@ -84,11 +84,11 @@ function getHeatmapColor(percent: number) {
           <div class="legend">
             <span class="legend-label">0%</span>
             <div class="legend-scale">
-              <div class="legend-step" style="background: #1a1a1a"></div>
               <div class="legend-step" style="background: #2a2a2a"></div>
-              <div class="legend-step" style="background: #3a3a3a"></div>
-              <div class="legend-step" style="background: #444444"></div>
               <div class="legend-step" style="background: #555555"></div>
+              <div class="legend-step" style="background: #888888"></div>
+              <div class="legend-step" style="background: #cccccc"></div>
+              <div class="legend-step" style="background: #ffffff"></div>
             </div>
             <span class="legend-label">100%</span>
           </div>

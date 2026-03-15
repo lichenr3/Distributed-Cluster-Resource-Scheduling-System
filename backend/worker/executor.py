@@ -22,7 +22,10 @@ async def execute_task(master_url: str, worker_id: str, task_id: str, command: s
             line = await process.stdout.readline()
             if not line:
                 break
-            content = line.decode("utf-8", errors="replace").rstrip("\r\n")
+            try:
+                content = line.decode("utf-8").rstrip("\r\n")
+            except UnicodeDecodeError:
+                content = line.decode("gbk", errors="replace").rstrip("\r\n")
             await report_log(master_url, task_id, worker_id, line_no, content)
             line_no += 1
 

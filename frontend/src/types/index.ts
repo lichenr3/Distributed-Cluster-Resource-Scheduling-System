@@ -15,6 +15,7 @@ export interface TaskInfo {
 }
 
 export interface TaskSubmitPayload {
+  task_id?: string
   command: string
   cpu_required: number
   mem_required: number

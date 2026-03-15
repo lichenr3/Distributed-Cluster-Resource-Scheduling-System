@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 import type { LogLine, LogWsFrame } from '@/types'
 
-const MAX_LOG_LINES = 5000
+const MAX_LOG_LINES = 1000
 
 /**
  * On-demand WebSocket connection to /ws/logs/{task_id}.

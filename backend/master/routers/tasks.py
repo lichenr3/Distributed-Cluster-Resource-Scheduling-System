@@ -15,8 +15,11 @@ async def create_task(
     req: TaskSubmitRequest,
     task_service: Annotated[TaskService, Depends(get_task_service)],
 ):
-    task_info = await task_service.create_and_schedule(req)
-    return ApiResponse(data=task_info)
+    try:
+        task_info = await task_service.create_and_schedule(req)
+        return ApiResponse(data=task_info)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 @router.get("/api/tasks")

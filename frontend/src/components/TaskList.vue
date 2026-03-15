@@ -2,6 +2,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { getTasks } from '@/api'
 import type { TaskInfo } from '@/types'
+import { useClusterWs } from '@/composables/useClusterWs'
 
 const props = defineProps<{
   filter?: string
@@ -13,6 +14,14 @@ const emit = defineEmits<{
 
 const tasks = ref<TaskInfo[]>([])
 const loading = ref(false)
+
+const { workers } = useClusterWs()
+
+function getWorkerName(workerId: string | null) {
+  if (!workerId) return '-'
+  const w = workers.value.find(w => w.worker_id === workerId)
+  return w ? w.display_name : workerId
+}
 
 async function fetchTasks() {
   loading.value = true
@@ -41,17 +50,17 @@ defineExpose({ fetchTasks })
     <table class="custom-table">
       <thead>
         <tr>
-          <th class="col-id">TASK ID</th>
-          <th class="col-cmd">COMMAND</th>
-          <th class="col-res">RESOURCES</th>
-          <th class="col-status">STATUS</th>
-          <th class="col-worker">WORKER</th>
-          <th class="col-actions">ACTIONS</th>
+          <th class="col-id">任务 ID</th>
+          <th class="col-cmd">执行命令</th>
+          <th class="col-res">所需资源</th>
+          <th class="col-status">任务状态</th>
+          <th class="col-worker">运行节点</th>
+          <th class="col-actions">操作</th>
         </tr>
       </thead>
       <tbody>
         <tr v-if="filteredTasks.length === 0">
-          <td colspan="6" class="empty-row">NO TASKS FOUND</td>
+          <td colspan="6" class="empty-row">暂无任务记录</td>
         </tr>
         <tr v-for="row in filteredTasks" :key="row.task_id">
           <td class="col-id">
@@ -65,10 +74,10 @@ defineExpose({ fetchTasks })
             <span class="status-pill" :class="row.status">{{ row.status.toUpperCase() }}</span>
           </td>
           <td class="col-worker">
-            <div class="truncate mono">{{ row.worker_id || '-' }}</div>
+            <div class="truncate mono">{{ getWorkerName(row.worker_id) }}</div>
           </td>
           <td class="col-actions">
-            <button class="ghost-btn" @click="emit('view-log', row.task_id)">View Logs</button>
+            <button class="ghost-btn" @click="emit('view-log', row.task_id)">查看日志</button>
           </td>
         </tr>
       </tbody>
@@ -113,7 +122,7 @@ tr:hover td {
   text-align: center;
   padding: 48px;
   color: var(--text-tertiary);
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   letter-spacing: 0.1em;
 }
 

@@ -17,6 +17,7 @@ __pycache__/
 *.pyo
 .venv/
 *.egg-info/
+.pytest_cache/
 
 # ── Node.js ──
 node_modules/
@@ -36,3 +37,12 @@ dist-ssr/
 
 # ── Original requirement PDF (large binary) ──
 *.pdf
+
+# ── Temp test output ──
+stderr.txt
+stdout.txt
+test_output.txt
+
+# ── Tool state (OpenCode / Sisyphus) ──
+.sisyphus/
+AGENTS.md

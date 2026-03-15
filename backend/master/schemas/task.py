@@ -4,6 +4,7 @@ from pydantic import BaseModel, Field
 
 
 class TaskSubmitRequest(BaseModel):
+    task_id: str | None = Field(None, description="Optional custom task ID")
     command: str = Field(..., min_length=1, max_length=1024)
     cpu_required: int = Field(..., ge=1)
     mem_required: int = Field(..., ge=1)

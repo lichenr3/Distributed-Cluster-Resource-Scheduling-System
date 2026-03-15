@@ -30,6 +30,13 @@ watch(
 function handleClose() {
   emit('update:visible', false)
 }
+
+function formatTime(isoStr: string) {
+  if (!isoStr) return ''
+  const date = new Date(isoStr)
+  const pad = (n: number) => n.toString().padStart(2, '0')
+  return `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`
+}
 </script>
 
 <template>
@@ -46,7 +53,7 @@ function handleClose() {
             
             <div class="header-right">
               <button v-if="!isAutoScrolling" class="scroll-btn" @click="scrollToBottom">
-                ↓ SCROLL TO BOTTOM
+                ↓ 回到底部
               </button>
               <span class="log-count">{{ logs.length }} LINES</span>
               <button class="close-btn" @click="handleClose">
@@ -57,11 +64,12 @@ function handleClose() {
 
           <div ref="logContainerRef" class="terminal-content" @scroll="onScroll">
             <div v-for="line in logs" :key="line.line_no" class="log-line">
+              <span class="timestamp">[{{ formatTime(line.timestamp) }}]</span>
               <span class="line-no">{{ line.line_no }}</span>
               <span class="line-content">{{ line.content }}</span>
             </div>
             <div v-if="logs.length === 0" class="log-empty">
-              <span class="cursor">_</span> WAITING FOR LOGS...
+              <span class="cursor">_</span> 等待日志输出...
             </div>
           </div>
         </div>
@@ -230,6 +238,14 @@ function handleClose() {
 
 .log-line:hover {
   background: rgba(255, 255, 255, 0.02);
+}
+
+.timestamp {
+  color: #555555;
+  user-select: none;
+  margin-right: 12px;
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
 }
 
 .line-no {
