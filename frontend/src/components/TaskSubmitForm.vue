@@ -57,10 +57,10 @@ defineExpose({ open })
     <el-dialog v-model="visible" title="提交新任务" width="480px" destroy-on-close class="custom-dialog">
     <el-form :model="form" label-position="top" class="custom-form">
       <el-form-item label="任务 ID (可选)" class="command-field">
-        <el-input v-model="form.task_id" placeholder="Leave empty to auto-generate UUID" />
+        <el-input v-model="form.task_id" placeholder="auto UUID" />
       </el-form-item>
       <el-form-item label="执行命令 (必填)" class="command-field">
-        <el-input v-model="form.command" type="textarea" :rows="3" resize="none" placeholder="python train.py --epochs 10" />
+        <el-input v-model="form.command" type="textarea" :rows="3" resize="none" placeholder="e.g. python train.py --epochs 10" />
       </el-form-item>
       <div class="form-row">
         <el-form-item label="CPU (核数)">
