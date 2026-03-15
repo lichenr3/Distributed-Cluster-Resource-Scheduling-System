@@ -18,6 +18,10 @@ function formatTime(isoString: string) {
   const date = new Date(isoString)
   return date.toLocaleTimeString([], { hour12: false })
 }
+
+function formatRes(val: number) {
+  return Number.isInteger(val) ? val : Number(val.toFixed(2))
+}
 </script>
 
 <template>
@@ -37,7 +41,7 @@ function formatTime(isoString: string) {
         <div class="bar-container">
           <div class="bar-fill" :style="{ width: `${cpuPercent}%` }"></div>
         </div>
-        <span class="value">{{ worker.used_cpu }}/{{ worker.total_cpu }}</span>
+        <span class="value">{{ formatRes(worker.used_cpu) }}/{{ worker.total_cpu }}</span>
       </div>
       
       <div class="resource-row">
@@ -45,7 +49,7 @@ function formatTime(isoString: string) {
         <div class="bar-container">
           <div class="bar-fill" :style="{ width: `${memPercent}%` }"></div>
         </div>
-        <span class="value">{{ worker.used_mem }}/{{ worker.total_mem }}</span>
+        <span class="value">{{ formatRes(worker.used_mem) }}/{{ worker.total_mem }}</span>
       </div>
     </div>
 
@@ -168,12 +172,14 @@ function formatTime(isoString: string) {
 }
 
 .value {
-  width: 40px;
+  width: 50px;
+  min-width: 50px;
   text-align: right;
   font-family: var(--font-mono);
   font-size: 11px;
   color: var(--text-secondary);
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .meta {

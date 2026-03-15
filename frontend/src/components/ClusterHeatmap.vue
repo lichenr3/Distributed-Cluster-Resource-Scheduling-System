@@ -95,13 +95,11 @@ function getHeatmapColor(percent: number) {
         </div>
       </div>
 
-      <!-- Worker Grid -->
       <div class="worker-grid">
         <WorkerCard 
           v-for="w in workers" 
           :key="w.worker_id" 
           :worker="w" 
-          :class="{ 'span-2': getCpuPercent(w) > 80 || getMemPercent(w) > 80 }"
         />
       </div>
     </template>
@@ -266,15 +264,5 @@ function getHeatmapColor(percent: number) {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 16px;
-}
-
-.span-2 {
-  grid-column: span 2;
-}
-
-@media (max-width: 1200px) {
-  .span-2 {
-    grid-column: span 1;
-  }
 }
 </style>
