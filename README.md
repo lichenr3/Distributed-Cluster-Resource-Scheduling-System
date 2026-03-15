@@ -108,6 +108,37 @@ uv run python run_worker.py --port <端口> --cpu <核数> --mem <内存GB>
 
 > Worker 启动后会自动向 Master 注册，无需额外配置。
 
+**跨网址部署 Worker**
+
+当 Worker 和 Master 不在同一台机器（不同 IP）时，通过 `--master-url` 指定 Master 的地址即可注册：
+
+```bash
+# Master 运行在 192.168.1.100:8000，Worker 在另一台机器上
+uv run python run_worker.py \
+  --port 8001 --cpu 4 --mem 8 \
+  --master-url http://192.168.1.100:8000
+```
+
+Worker 启动参数一览：
+
+| 参数 | 说明 | 默认值 | 是否必填 |
+|------|------|--------|----------|
+| `--port` | Worker 监听端口 | — | 必填 |
+| `--cpu` | 声明的 CPU 核数 | — | 必填 |
+| `--mem` | 声明的内存 (GB) | — | 必填 |
+| `--master-url` | Master 的完整地址（含端口） | `http://localhost:8000` | 跨网址时必填 |
+| `--host` | 手动指定 Worker 的回调 IP | `0.0.0.0` | 可选 |
+| `--worker-id` | 自定义 Worker ID | 自动生成 | 可选 |
+
+**`--host` 的自动识别逻辑：**
+
+Master 需要知道 Worker 的 IP 地址才能回调派发任务。这个地址的确定规则如下：
+
+1. 如果 Worker 启动时指定了 `--host`（如 `--host 192.168.1.200`），Master 直接使用该地址
+2. 如果没有指定 `--host`（默认 `0.0.0.0`），Master 会自动从注册请求的来源 IP 中提取 Worker 的真实地址
+
+因此大多数情况下**不需要手动填写** `--host`，Master 能自动识别。只有在网络环境复杂（多网卡、NAT、代理）导致自动识别的 IP 不正确时，才需要手动指定。
+
 **4. 启动前端（新开终端）**
 
 ```bash

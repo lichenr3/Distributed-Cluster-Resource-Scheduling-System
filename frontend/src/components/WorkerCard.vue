@@ -55,6 +55,10 @@ function formatRes(val: number) {
 
     <div class="meta">
       <div class="meta-item">
+        <span class="meta-label">地址</span>
+        <span class="meta-value">{{ worker.host }}:{{ worker.port }}</span>
+      </div>
+      <div class="meta-item">
         <span class="meta-label">运行任务</span>
         <span class="meta-value">{{ worker.task_count }}</span>
       </div>

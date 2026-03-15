@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 
 from master.core.dependencies import get_task_service, get_worker_service
 from master.schemas.response import ApiResponse
@@ -11,12 +11,17 @@ from master.services.worker_service import WorkerService
 
 router = APIRouter(tags=["internal"])
 
+_WILDCARD_HOSTS = {"0.0.0.0", "::", "[::]", ""}
+
 
 @router.post("/internal/register")
 async def register_worker(
     req: WorkerRegisterRequest,
+    request: Request,
     worker_service: Annotated[WorkerService, Depends(get_worker_service)],
 ):
+    if req.host in _WILDCARD_HOSTS and request.client:
+        req = req.model_copy(update={"host": request.client.host})
     data = await worker_service.register(req)
     return ApiResponse(data=data)
 
