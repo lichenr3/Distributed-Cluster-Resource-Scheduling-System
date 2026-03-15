@@ -2,6 +2,15 @@
 
 一个基于 Master-Worker 架构的分布式任务调度系统，支持 Bin Packing 智能调度、实时资源监控和任务日志流。
 
+## 核心功能
+
+- **节点注册** — Worker 启动后自动向 Master 注册，上报 CPU 核数与内存
+- **Bin Packing 调度** — Master 根据 Worker 剩余资源智能分配任务，支持资源切分
+- **任务状态追踪** — Pending → Running → Success / Failed 全生命周期管理
+- **集群资源热力图** — 卡片式展示各 Worker 实时 CPU / 内存占用率
+- **任务日志流** — 点击运行中任务实时查看 stdout 输出，自动滚动到底部
+- **离线感知** — Worker 心跳丢失时卡片标灰显示 OFFLINE
+
 ## 技术栈
 
 | 层级 | 技术 |
@@ -27,14 +36,10 @@
                    └─────────────┘     └─────────────┘
 ```
 
-**核心功能：**
+通信方向：
 
-- **节点注册** — Worker 启动后自动向 Master 注册，上报 CPU 核数与内存
-- **Bin Packing 调度** — Master 根据 Worker 剩余资源智能分配任务，支持资源切分
-- **任务状态追踪** — Pending → Running → Success / Failed 全生命周期管理
-- **集群资源热力图** — 卡片式展示各 Worker 实时 CPU / 内存占用率
-- **任务日志流** — 点击运行中任务实时查看 stdout 输出，自动滚动到底部
-- **离线感知** — Worker 心跳丢失时卡片标灰显示 OFFLINE
+- **注册 / 心跳：** Worker → Master（Worker 主动发起，依赖 `--master-url`）
+- **派发任务：** Master → Worker（Master 回调 Worker，依赖注册时记录的 `host:port`）
 
 ## 环境要求
 
@@ -65,18 +70,20 @@ start.bat
 stop.bat
 ```
 
-### 方式二：从零开始手动启动
+### 方式二：手动启动
 
-适用于所有操作系统（Windows / macOS / Linux），按顺序执行以下步骤：
+适用于所有操作系统（Windows / macOS / Linux），按顺序执行以下步骤。
+
+**启动顺序：Master → Worker(s) → Frontend**，Master 必须先于 Worker 启动，前端随时可启。
 
 **1. 安装依赖**
 
 ```bash
-# 安装后端 Python 依赖
+# 后端
 cd backend
 uv sync
 
-# 安装前端 Node.js 依赖
+# 前端
 cd ../frontend
 npm install
 ```
@@ -86,12 +93,26 @@ npm install
 ```bash
 cd backend
 uv run python run_master.py
-# Master 监听 http://localhost:8000
+# Master 监听 http://0.0.0.0:8000
+
+# 也可以自定义参数启动
+uv run python run_master.py --port 9000 --heartbeat-timeout 20
 ```
+
+Master 启动参数一览：
+
+| 参数 | 说明 | 默认值 | 是否必填 |
+|------|------|--------|----------|
+| `--host` | 监听地址 | `0.0.0.0` | 可选 |
+| `--port` | 监听端口 | `8000` | 可选 |
+| `--heartbeat-interval` | 心跳扫描间隔（秒） | `5` | 可选 |
+| `--heartbeat-timeout` | Worker 超时阈值（秒） | `15` | 可选 |
+| `--broadcast-interval` | 集群状态广播间隔（秒） | `1` | 可选 |
+| `--log-buffer-size` | 每任务日志缓冲行数 | `1000` | 可选 |
 
 **3. 启动 Worker（新开终端，可启动任意数量）**
 
-每个 Worker 需要指定端口、CPU 核数和内存大小，在**新的终端窗口**中分别运行：
+每个 Worker 需要指定端口、CPU 核数和内存大小：
 
 ```bash
 cd backend
@@ -101,23 +122,9 @@ uv run python run_worker.py --port 8001 --cpu 4 --mem 8
 
 # Worker 2 — 2核 4G（新终端）
 uv run python run_worker.py --port 8002 --cpu 2 --mem 4
-
-# 按需继续添加更多 Worker...
-uv run python run_worker.py --port <端口> --cpu <核数> --mem <内存GB>
 ```
 
-> Worker 启动后会自动向 Master 注册，无需额外配置。
-
-**跨网址部署 Worker**
-
-当 Worker 和 Master 不在同一台机器（不同 IP）时，通过 `--master-url` 指定 Master 的地址即可注册：
-
-```bash
-# Master 运行在 192.168.1.100:8000，Worker 在另一台机器上
-uv run python run_worker.py \
-  --port 8001 --cpu 4 --mem 8 \
-  --master-url http://192.168.1.100:8000
-```
+Worker 启动后会自动向 Master 注册，无需额外配置。
 
 Worker 启动参数一览：
 
@@ -130,15 +137,6 @@ Worker 启动参数一览：
 | `--host` | 手动指定 Worker 的回调 IP | `0.0.0.0` | 可选 |
 | `--worker-id` | 自定义 Worker ID | 自动生成 | 可选 |
 
-**`--host` 的自动识别逻辑：**
-
-Master 需要知道 Worker 的 IP 地址才能回调派发任务。这个地址的确定规则如下：
-
-1. 如果 Worker 启动时指定了 `--host`（如 `--host 192.168.1.200`），Master 直接使用该地址
-2. 如果没有指定 `--host`（默认 `0.0.0.0`），Master 会自动从注册请求的来源 IP 中提取 Worker 的真实地址
-
-因此大多数情况下**不需要手动填写** `--host`，Master 能自动识别。只有在网络环境复杂（多网卡、NAT、代理）导致自动识别的 IP 不正确时，才需要手动指定。
-
 **4. 启动前端（新开终端）**
 
 ```bash
@@ -147,7 +145,25 @@ npm run dev
 # 前端访问 http://localhost:5173
 ```
 
-**启动顺序：Master → Worker(s) → Frontend**，Master 必须先于 Worker 启动，前端随时可启。
+## 跨网址部署
+
+当 Worker 和 Master 不在同一台机器时，通过 `--master-url` 指定 Master 的地址即可注册：
+
+```bash
+# Master 运行在 192.168.1.100:8000，Worker 在另一台机器上
+uv run python run_worker.py \
+  --port 8001 --cpu 4 --mem 8 \
+  --master-url http://192.168.1.100:8000
+```
+
+**`--host` 的自动识别逻辑：**
+
+Master 派发任务时需要回调 Worker，因此需要知道 Worker 的 IP 地址。这个地址按以下规则确定：
+
+1. 如果 Worker 指定了 `--host`（如 `--host 192.168.1.200`），Master 直接使用该地址
+2. 如果没有指定 `--host`（默认 `0.0.0.0`），Master 自动从注册请求的来源 IP 中提取 Worker 的真实地址
+
+大多数情况下**不需要手动填写** `--host`。只有在网络环境复杂（多网卡、NAT、代理）导致自动识别的 IP 不正确时，才需要手动指定。
 
 ## 项目结构
 

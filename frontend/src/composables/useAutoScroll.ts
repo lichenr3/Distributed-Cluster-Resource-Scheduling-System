@@ -28,10 +28,15 @@ export function useAutoScroll(
 
   watch(
     () => logs.value.length,
-    () => {
+    (_newLen, oldLen) => {
       if (!isAutoScrolling.value) return
+      const isInitialLoad = (oldLen === 0 || oldLen === undefined) && _newLen > 0
       nextTick(() => {
-        scrollToBottom()
+        if (isInitialLoad) {
+          requestAnimationFrame(() => scrollToBottom())
+        } else {
+          scrollToBottom()
+        }
       })
     },
   )
