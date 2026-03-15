@@ -24,7 +24,7 @@ class TaskService:
             if worker["total_cpu"] >= req.cpu_required and worker["total_mem"] >= req.mem_required:
                 can_run = True
                 break
-                
+
         task: store.TaskState = {
             "task_id": task_id,
             "command": req.command,
