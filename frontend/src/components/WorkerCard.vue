@@ -59,7 +59,7 @@ function formatRes(val: number) {
         <span class="meta-value">{{ worker.host }}:{{ worker.port }}</span>
       </div>
       <div class="meta-item">
-        <span class="meta-label">运行任务</span>
+        <span class="meta-label">运行任务数</span>
         <span class="meta-value">{{ worker.task_count }}</span>
       </div>
       <div class="meta-item">
