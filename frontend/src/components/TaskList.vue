@@ -95,6 +95,7 @@ defineExpose({ fetchTasks })
   width: 100%;
   border-collapse: collapse;
   text-align: left;
+  table-layout: fixed;
 }
 
 th {

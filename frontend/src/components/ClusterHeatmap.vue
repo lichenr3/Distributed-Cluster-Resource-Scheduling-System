@@ -184,7 +184,7 @@ function getHeatmapColor(percent: number) {
 .detailed-grid {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 2px;
   margin-top: 16px;
   overflow-x: auto;
   padding-bottom: 8px;
