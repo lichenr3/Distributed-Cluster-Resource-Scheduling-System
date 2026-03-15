@@ -28,17 +28,31 @@ if errorlevel 1 (
 )
 
 if not exist "%BACKEND%\.venv" (
-    echo [INFO] Creating backend venv...
+    echo [INFO] Creating backend venv and installing dependencies...
     pushd "%BACKEND%"
     uv sync
+    if errorlevel 1 (
+        echo [ERROR] Backend dependency installation failed. Please run 'cd backend ^&^& uv sync' manually.
+        popd
+        pause
+        exit /b 1
+    )
     popd
+    echo [INFO] Backend dependencies installed successfully.
 )
 
 if not exist "%FRONTEND%\node_modules" (
-    echo [INFO] Installing frontend dependencies...
+    echo [INFO] Installing frontend dependencies (this may take a few minutes on first run)...
     pushd "%FRONTEND%"
-    npm install
+    call npm install
+    if errorlevel 1 (
+        echo [ERROR] Frontend dependency installation failed. Please run 'cd frontend ^&^& npm install' manually.
+        popd
+        pause
+        exit /b 1
+    )
     popd
+    echo [INFO] Frontend dependencies installed successfully.
 )
 
 :: ---------- Start Master ----------
